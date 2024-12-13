@@ -14,8 +14,8 @@ headline_id <- data
 story_levels <- unique(story_id)
 I <- length(story_levels)  # Number of stories
 J <- max(table(story_id))  # Max headlines per story
-y <- clicks
-n <- impressions
+y <- as.matrix(read.csv('y_matrix.csv', row.names=1))
+n <- as.matrix(read.csv('n_matrix.csv', row.names=1))
 
 # 3. Initialize Hyperpriors
 # Hyperprior gamma parameters
@@ -40,8 +40,10 @@ samples <- list(alpha = matrix(NA, nrow = n_iter, ncol = I),
                 beta = matrix(NA, nrow = n_iter, ncol = I),
                 p = array(NA, c(n_iter, I, J)))
 
+print("starting gibbs")
 # Gibbs loop
 for (t in 1:n_iter) {
+  print(t)
   # Update p_ij for each headline
   for (i in 1:I) {
     for (j in 1:J) {
