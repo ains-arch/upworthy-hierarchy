@@ -1,3 +1,4 @@
 .RData
+.RDataTmp
 .Rhistory
 upworthy-archive-datasets/*
