@@ -41,7 +41,7 @@ beta <- rgamma(I, B, D)
 # 5. Gibbs Sampling Loop
 # Number of chains
 n_chains <- 5
-n_iter <- 10000  # Number of iterations per chain
+n_iter <- 1000  # Number of iterations per chain
 
 # Storage for all chains
 all_samples <- vector("list", n_chains)

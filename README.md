@@ -177,6 +177,6 @@ This is a contrived variable, but it allows us to look at a single measure acros
 Next, a heat map of the clickthrough rates in the first chain by stories as the chain progresses.
 <img src=figs/heatmap_clickthrough_rates.png/>
 
-To look at if a difference in story makes a difference in the clickthrough rate, we check the variance of the mean clickthrough rates across stories: $0.0001507662$.
+To look at if a difference in story makes a difference in the clickthrough rate, we check the variance of the mean clickthrough rates across stories: $0.0001452941$.
 
 So, no? Or there's something wrong with the code. Impossible to say. ...Thanks for reading.
