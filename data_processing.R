@@ -2,22 +2,28 @@
 setwd("~/Documents/School/stats/final")
 # sys.setenv(TEXINPUTS = "/usr/local/texlive/2024/texmf-dist/tex//:")
 install.packages("dplyr")
+install.packages("data.table")
 library(dplyr)
+library(data.table)
 
 # Load data
 data <- read.csv("upworthy-archive-datasets/upworthy-archive-exploratory-packages-03.12.2020.csv")
 
-# Select relevant columns
-data_clean <- data |>
-  select(clickability_test_id, headline, impressions, clicks) |>
-  filter(
-    !is.na(clickability_test_id) & 
-    !is.na(headline) & 
-    !is.na(impressions) & 
-    !is.na(clicks) &
-    impressions > 0 & 
-    clicks > 0
-  )
+# Convert to data.table
+dt <- as.data.table(data)
+
+# Select relevant columns and filter
+data_clean <- dt[
+  !is.na(clickability_test_id) &
+  !is.na(headline) &
+  !is.na(impressions) &
+  !is.na(clicks) &
+  impressions > 0 &
+  clicks > 0,
+  .(clickability_test_id, headline, impressions, clicks)
+]
+
+print("data cleaned")
 
 # Group and summarize by test and headline
 data_grouped <- data_clean |>
@@ -28,6 +34,8 @@ data_grouped <- data_clean |>
     .groups = "drop"
   )
 
+print("data grouped")
+
 # Create matrices for Bayesian analysis
 test_ids <- unique(data_grouped$clickability_test_id)
 headline_ids <- unique(data_grouped$headline)
@@ -37,7 +45,9 @@ y <- matrix(0, nrow = length(test_ids), ncol = length(headline_ids))
 n <- matrix(0, nrow = length(test_ids), ncol = length(headline_ids))
 
 # Fill matrices
+print(length(test_ids))
 for (i in seq_along(test_ids)) {
+  print(i)
   for (j in seq_along(headline_ids)) {
     row <- data_grouped |>
       filter(clickability_test_id == test_ids[i] & headline == headline_ids[j])
