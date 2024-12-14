@@ -145,6 +145,7 @@ We use gamma distributions because $\alpha_{ij}$s and $\beta{ij}$s have to be po
 
 ```math
 \alpha_i \sim \text{gamma}(A_i, C_i)
+
 \beta_i \sim \text{gamma}(B_i, D_i)
 ```
 
@@ -154,8 +155,11 @@ We again use gamma distributions because $A$, $B$, $C$, and $D$ have to be posit
 
 ```math
 A \sim \text{gamma}(x_1, x_2) 
+
 B \sim \text{gamma}(x_3, x_4) 
+
 C \sim \text{gamma}(x_5, x_6) 
+
 D \sim \text{gamma}(x_7, x_8) 
 ```
 
