@@ -121,6 +121,8 @@ Additionally, with click through rates as low as they are, the approach to handl
 ## Beta-Binomial model (`beta.R`)
 In our final approach, we modeled the data as Gamma-Gamma-Beta-Binomial.
 
+<img src=figs/model.png/>
+
 ### Binomial likelihood
 We again model clicks, for headline $j$ and story $i$:
 ```math
@@ -163,10 +165,10 @@ All other priors are informative priors, but they are informed by the data rathe
 ### Results
 First, a trace plot showing convergence in the mean $\alpha$ across the stories.
 This is a contrived variable, but it allows us to look at a single measure across the five chains.
-<img src=combined_trace_plot.png/>
+<img src=figs/combined_trace_plot.png/>
 
 Next, a heat map of the clickthrough rates in the first chain by stories as the chain progresses.
-<img src=heatmap_clickthrough_rates.png/>
+<img src=figs/heatmap_clickthrough_rates.png/>
 
 To look at if a difference in story makes a difference in the clickthrough rate, we check the variance of the mean clickthrough rates across stories: $0.0001507662$.
 
