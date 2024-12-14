@@ -92,8 +92,8 @@ def main():
     y_df = pd.DataFrame(y, index=story_levels)
     n_df = pd.DataFrame(n, index=story_levels)
     
-    y_df.to_csv('y_matrix.csv')
-    n_df.to_csv('n_matrix.csv')
+    y_df.to_csv('cleaned_data/y_matrix.csv')
+    n_df.to_csv('cleaned_data/n_matrix.csv')
     
     # Additional diagnostics
     print("\nNumber of stories:", y.shape[0])

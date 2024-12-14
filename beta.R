@@ -19,8 +19,8 @@ headline_id <- data
 story_levels <- unique(story_id)
 I <- length(story_levels)  # Number of stories
 J <- max(table(story_id))  # Max headlines per story
-y <- as.matrix(read.csv('y_matrix.csv', row.names=1))
-n <- as.matrix(read.csv('n_matrix.csv', row.names=1))
+y <- as.matrix(read.csv('cleaned_data/y_matrix.csv', row.names=1))
+n <- as.matrix(read.csv('cleaned_data/n_matrix.csv', row.names=1))
 
 # 3. Initialize Hyperpriors
 # Hyperprior gamma parameters
