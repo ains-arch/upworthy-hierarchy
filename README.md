@@ -162,6 +162,9 @@ D \sim \text{gamma}(x_7, x_8)
 We chose the eight hyperhyperhyperparameter $x$s as non-informative $x=1$.
 All other priors are informative priors, but they are informed by the data rather than our prior knowledge.
 
+### Method
+We again used five chains, this time with 1000 steps of Gibbs sampling, to iteratively update all parameters.
+
 ### Results
 First, a trace plot showing convergence in the mean $\alpha$ across the stories.
 This is a contrived variable, but it allows us to look at a single measure across the five chains.
