@@ -180,3 +180,15 @@ Next, a heat map of the clickthrough rates in the first chain by stories as the 
 To look at if a difference in story makes a difference in the clickthrough rate, we check the variance of the mean clickthrough rates across stories: $0.0001452941$.
 
 So, no? Or there's something wrong with the code. Impossible to say. ...Thanks for reading.
+
+## Running this code
+You must unzip the datasets:
+```
+$ unzip upworthy-archive-datasets.zip
+```
+If you'd like to rerun the data processing, you can, but the datasets are also already in `cleaned_data/`
+```
+$ pip install numpy pandas
+$ python3 data_processing.py
+```
+You can run `normal.R` and `beta.R` from the command line using Rscript, or in RStudio.
