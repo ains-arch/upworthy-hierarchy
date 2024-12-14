@@ -41,7 +41,7 @@ beta <- rgamma(I, B, D)
 # 5. Gibbs Sampling Loop
 # Number of chains
 n_chains <- 5
-n_iter <- 100  # Number of iterations per chain
+n_iter <- 10000  # Number of iterations per chain
 
 # Storage for all chains
 all_samples <- vector("list", n_chains)
@@ -113,7 +113,11 @@ ggplot(trace_data, aes(x = Iteration, y = AverageAlpha, color = Chain)) +
        x = "Iteration",
        y = "Average Alpha",
        color = "Chain") +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA), # White panel background
+    plot.background = element_rect(fill = "white", color = NA)   # White plot background
+  )
 
 # Save the plot
 ggsave("figs/combined_trace_plot.png", width = 8, height = 6)
@@ -126,4 +130,27 @@ variance_of_means <- var(story_means, na.rm = TRUE)
 
 cat("Variance of mean clickthrough rates across stories:", variance_of_means, "\n")
 
+# Heat map of mean clickthrough rates (p_ij)
+# Compute mean probabilities for each story across iterations
+heatmap_data <- apply(all_samples[[1]]$p, c(2, 1), mean, na.rm = TRUE)  # Dimensions: [Stories, Iterations]
 
+# Convert to data frame for plotting
+heatmap_df <- melt(heatmap_data)
+colnames(heatmap_df) <- c("Story", "Iteration", "MeanProbability")
+
+# Create heat map
+ggplot(heatmap_df, aes(x = Iteration, y = Story, fill = MeanProbability)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0.5, limits = c(0, 1)) +
+  labs(title = "Heat Map of Mean Clickthrough Rates Over Iterations",
+       x = "Iteration",
+       y = "Story",
+       fill = "Mean CTR") +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA), # White panel background
+    plot.background = element_rect(fill = "white", color = NA)   # White plot background
+  )
+
+# Save the heat map
+ggsave("figs/heatmap_clickthrough_rates.png", width = 10, height = 8)
