@@ -3,7 +3,7 @@
 setwd("~/Documents/School/stats/final")
 # install.packages("ggplot2")
 library(ggplot2)
-install.packages("reshape2")
+# install.packages("reshape2")
 library(reshape2)
 
 data <- read.csv("upworthy-archive-datasets/upworthy-archive-exploratory-packages-03.12.2020.csv")
@@ -39,80 +39,91 @@ alpha <- rgamma(I, A, C)
 beta <- rgamma(I, B, D)
 
 # 5. Gibbs Sampling Loop
-# Storage for samples
-n_iter <- 100
-samples <- list(alpha = matrix(NA, nrow = n_iter, ncol = I),
-                beta = matrix(NA, nrow = n_iter, ncol = I),
-                p = array(NA, c(n_iter, I, J)))
+# Number of chains
+n_chains <- 5
+n_iter <- 100  # Number of iterations per chain
 
-print("starting gibbs")
-# Gibbs loop
-for (t in 1:n_iter) {
-  print(t/n_iter)
-  # Update p_ij for each headline
-  for (i in 1:I) {
-    for (j in 1:J) {
-      if (!is.na(y[i, j])) {
-        p <- rbeta(1, alpha[i] + y[i, j], beta[i] + n[i, j] - y[i, j])
-        samples$p[t, i, j] <- p
+# Storage for all chains
+all_samples <- vector("list", n_chains)
+for (chain in 1:n_chains) {
+  print(paste("Starting chain", chain))
+  
+  # Initialize chain-specific parameters
+  A <- rgamma(1, x1, x2)
+  B <- rgamma(1, x3, x4)
+  C <- rgamma(1, x5, x6)
+  D <- rgamma(1, x7, x8)
+  alpha <- rgamma(I, A, C)
+  beta <- rgamma(I, B, D)
+  
+  # Storage for samples in this chain
+  chain_samples <- list(
+    alpha = matrix(NA, nrow = n_iter, ncol = I),
+    beta = matrix(NA, nrow = n_iter, ncol = I),
+    p = array(NA, c(n_iter, I, J))
+  )
+  
+  # Gibbs loop for this chain
+  for (t in 1:n_iter) {
+    # Update p_ij
+    for (i in 1:I) {
+      for (j in 1:J) {
+        if (!is.na(y[i, j])) {
+          p <- rbeta(1, alpha[i] + y[i, j], beta[i] + n[i, j] - y[i, j])
+          chain_samples$p[t, i, j] <- p
+        }
       }
     }
+
+    # Update alpha_i and beta_i
+    for (i in 1:I) {
+      alpha[i] <- rgamma(1, A + sum(y[i, ]), C + sum(n[i, ]))
+      beta[i] <- rgamma(1, B + sum(n[i, ] - y[i, ]), D + sum(n[i, ]))
+      chain_samples$alpha[t, i] <- alpha[i]
+      chain_samples$beta[t, i] <- beta[i]
+    }
+
+    # Update hyperparameters
+    A <- rgamma(1, x1 + sum(alpha), x2 + I)
+    B <- rgamma(1, x3 + sum(beta), x4 + I)
+    C <- rgamma(1, x5 + sum(alpha), x6 + I)
+    D <- rgamma(1, x7 + sum(beta), x8 + I)
   }
 
-  # Update alpha_i and beta_i
-  for (i in 1:I) {
-    alpha[i] <- rgamma(1, A + sum(y[i, ]), C + sum(n[i, ]))
-    beta[i] <- rgamma(1, B + sum(n[i, ] - y[i, ]), D + sum(n[i, ]))
-    samples$alpha[t, i] <- alpha[i]
-    samples$beta[t, i] <- beta[i]
-  }
-
-  # Update A, B, C, D (hyperparameters)
-  A <- rgamma(1, x1 + sum(alpha), x2 + I)
-  B <- rgamma(1, x3 + sum(beta), x4 + I)
-  C <- rgamma(1, x5 + sum(alpha), x6 + I)
-  D <- rgamma(1, x7 + sum(beta), x8 + I)
-
-  print(A)
-  print(B)
-  print(C)
-  print(D)
-
+  # Save this chain's samples
+  all_samples[[chain]] <- chain_samples
 }
 
-print(samples$alpha[1:5, ])
-print(samples$beta[1:5, ])
-print(samples$p[1:5, , ])
+# Calculate average alpha per iteration for each chain
+alpha_averages <- sapply(all_samples, function(chain_samples) {
+  rowMeans(chain_samples$alpha, na.rm = TRUE)
+})
 
-for (i in 1:5) {
-  png(paste0("figs/alpha_traceplot_", i, ".png"), width = 800, height = 600)
-  plot(samples$alpha[, i], type = "l",
-       main = paste("Traceplot for alpha[", i, "]"),
-       xlab = "Iteration", ylab = paste("Alpha[", i, "]"))
-  dev.off()
-}
+# Convert to data frame for plotting
+trace_data <- data.frame(
+  Iteration = rep(1:n_iter, n_chains),
+  AverageAlpha = as.vector(alpha_averages),
+  Chain = factor(rep(1:n_chains, each = n_iter))
+)
 
-for (i in 1:5) {
-  png(paste0("figs/beta_traceplot_", i, ".png"), width = 800, height = 600)
-  plot(samples$beta[, i], type = "l",
-       main = paste("Traceplot for beta[", i, "]"),
-       xlab = "Iteration", ylab = paste("Beta[", i, "]"))
-  dev.off()
-}
-
-mean_p <- apply(samples$p[1:100, , ], c(2, 3), mean, na.rm = TRUE)
-print(mean_p[1:5, 1:5])  # Look at the first few story-headline pairs
-
-mean_alpha <- colMeans(samples$alpha[50:100, ])
-mean_beta <- colMeans(samples$beta[50:100, ])
-print(mean_alpha)
-print(mean_beta)
-
-# Save heatmap
-png("figs/posterior_mean_heatmap.png", width = 800, height = 600)
-ggplot(melt(mean_p), aes(Var1, Var2, fill = value)) +
-  geom_tile() +
-  labs(title = "Posterior Mean Probabilities", x = "Story", y = "Headline") +
-  scale_fill_gradient(low = "blue", high = "red") +
+# Create a combined trace plot
+ggplot(trace_data, aes(x = Iteration, y = AverageAlpha, color = Chain)) +
+  geom_line() +
+  labs(title = "Trace Plot of Average Alpha Across Chains",
+       x = "Iteration",
+       y = "Average Alpha",
+       color = "Chain") +
   theme_minimal()
-dev.off()
+
+# Save the plot
+ggsave("figs/combined_trace_plot.png", width = 8, height = 6)
+
+# Compute the mean clickthrough rate for each story across iterations
+story_means <- apply(all_samples[[1]]$p, c(2), mean, na.rm = TRUE)
+
+# Compute the variance of these story means
+variance_of_means <- var(story_means, na.rm = TRUE)
+
+cat("Variance of mean clickthrough rates across stories:", variance_of_means, "\n")
+
+
