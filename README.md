@@ -144,8 +144,7 @@ There are two for each story, and model which story is more likely to get clicke
 We use gamma distributions because $\alpha_{ij}$s and $\beta{ij}$s have to be positive.
 
 ```math
-\alpha_i \sim \text{gamma}(A_i, C_i)
-
+\alpha_i \sim \text{gamma}(A_i, C_i) \\
 \beta_i \sim \text{gamma}(B_i, D_i)
 ```
 
@@ -154,13 +153,10 @@ At the population level, we have four total gamma distributions as hyperhyperpri
 We again use gamma distributions because $A$, $B$, $C$, and $D$ have to be positive.
 
 ```math
-A \sim \text{gamma}(x_1, x_2) 
-
-B \sim \text{gamma}(x_3, x_4) 
-
-C \sim \text{gamma}(x_5, x_6) 
-
-D \sim \text{gamma}(x_7, x_8) 
+A \sim \text{gamma}(x_1, x_2) \\
+B \sim \text{gamma}(x_3, x_4) \\
+C \sim \text{gamma}(x_5, x_6) \\
+D \sim \text{gamma}(x_7, x_8) \\
 ```
 
 We chose the eight hyperhyperhyperparameter $x$s as non-informative $x=1$.
